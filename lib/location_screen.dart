@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
@@ -11,12 +13,42 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   LocationData? myLocation;
+  late StreamSubscription _streamSubscription;
 
   void getLocation() async {
+    await Location.instance.requestPermission(); //User getLocation Permission
+    await Location.instance.hasPermission().then((permissionStatus) {
+      print(permissionStatus);
+    });
     myLocation = await Location.instance.getLocation();
-    setState(() {});
+    if(mounted){
+      setState(() {});
+    }
+
+
     print(myLocation);
   }
+
+  void listenToMyLocation(){
+    _streamSubscription=Location.instance.onLocationChanged.listen((location) {
+      myLocation=location;
+
+      if(mounted){
+        setState(() {});
+      }
+
+      print(myLocation);
+    });
+  }
+
+  void stopToListenLocation(){
+    _streamSubscription.cancel();
+    if(mounted){
+      setState(() {});
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +67,30 @@ class _LocationScreenState extends State<LocationScreen> {
           ],
         ),
       ),
-
-
-
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          getLocation();
-        },
-        child: Icon(Icons.my_location),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              stopToListenLocation();
+            },
+            child: Icon(Icons.stop),
+          ),
+          SizedBox(width: 10,),
+          FloatingActionButton(
+            onPressed: () {
+              listenToMyLocation();
+            },
+            child: Icon(Icons.start_rounded),
+          ),
+          SizedBox(width: 10,),
+          FloatingActionButton(
+            onPressed: () {
+              getLocation();
+            },
+            child: Icon(Icons.my_location),
+          ),
+        ],
       ),
     );
   }
