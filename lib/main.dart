@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'map_location_screen.dart';
+import 'map_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: MapLocationScreen(),
+      home: MapScreen(),
     );
   }
 }
